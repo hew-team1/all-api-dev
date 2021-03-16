@@ -1,0 +1,94 @@
+version: '3'
+services:
+  end_user:
+    container_name: end_user_api
+    build:
+      ./end_user
+    volumes:
+      - ./end_user:/app
+    ports:
+      - 60001:60001
+    env_file:
+      - .env
+
+  recruit:
+    container_name: recruit_api
+    build:
+      ./recruit
+    volumes:
+      - ./recruit:/app
+    ports:
+      - 60002:60002
+    env_file:
+      - .env
+
+  connpass:
+    container_name: connpass_api
+    build:
+      ./connpass
+    volumes:
+      - ./connpass:/app
+    ports:
+      - 60003:60003
+    env_file:
+      - .env
+
+  admin_end_user:
+    container_name: admin_end_user_api
+    build:
+      ./admin/end_user
+    volumes:
+      - ./admin/end_user:/app
+    ports:
+      - 60011:60011
+    env_file:
+      - .env
+
+  admin_recruit:
+    container_name: admin_recruit_api
+    build:
+      ./admin/recruit
+    volumes:
+      - ./admin/recruit:/app
+    ports:
+      - 60012:60012
+    env_file:
+      - .env
+
+  awscli:
+      container_name: awscli
+      build:
+        ./cli
+      volumes:
+        - ./config:/root/.aws/config
+        - ./credentials:/root/.aws/credentials
+      depends_on:
+        - dynamodb
+
+  dynamodb:
+      container_name: dynamodb
+      command: -jar DynamoDBLocal.jar -sharedDb -dbPath ./data
+      volumes:
+        - ./db:/home/dynamodblocal/data
+      build:
+        ./db
+      ports:
+        - 8000:8000
+
+  dynamo-admin:
+    image: instructure/dynamo-local-admin
+    ports:
+      - "8008:8000"
+    environment:
+      - DYNAMO_ENDPOINT=dynamodb:8000
+    depends_on:
+      - dynamodb
+
+  localstack:
+    container_name: ses
+    image: localstack/localstack
+    ports:
+      - 4579:4579
+    environment:
+      - service=ses
+      - DEFAULT_REGION=ap-northeast-3

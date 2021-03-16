@@ -1,0 +1,20 @@
+# all
+.idea/
+# front
+## next.js build output
+front/.next
+## dotenv environment variables file (build for Zeit Now)
+front/.env
+front/.env.build
+## Dependency directories
+front/node_modules/
+## Logs
+front/npm-debug.log*
+front/yarn-debug.log*
+front/yarn-error.log*
+
+.env
+config
+credentials
+
+.DS_Store
