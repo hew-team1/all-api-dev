@@ -5,21 +5,21 @@ api_start:
 	docker run --tty -it -d -p 8080:8080 userapi:${version}
 
 compose_build:
-	docker-compose build
+	docker compose build
 
 compose_start:
-	docker-compose up -d
+	docker compose up -d
 
 compose_restart:
-	docker-compose down; \
-    docker-compose build; \
-    docker-compose up -d
+	docker compose down; \
+    docker compose build; \
+    docker compose up -d
 
 dlog:
 	docker logs $(co)_api
 
 end_user_create:
-	docker-compose run awscli \
+	docker compose run awscli \
     --endpoint-url http://dynamodb:8000 \
     dynamodb create-table \
         --table-name EndUsers \
@@ -29,7 +29,7 @@ end_user_create:
         --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1
 
 recruit_create:
-	docker-compose run awscli \
+	docker compose run awscli \
     --endpoint-url http://dynamodb:8000 \
     dynamodb create-table \
         --table-name Recruits \
