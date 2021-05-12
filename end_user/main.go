@@ -49,7 +49,7 @@ func main() {
 	fmt.Println("サーバー起動 :80 port で受信")
 
 	// log.Fatal は、異常を検知すると処理の実行を止めてくれる
-	log.Fatal(http.ListenAndServe(":80", c))
+	log.Fatal(http.ListenAndServe(":60001", c))
 }
 
 // io.Readerをbyteのスライスに変換

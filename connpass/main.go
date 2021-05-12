@@ -87,7 +87,7 @@ func HackathonGet(w http.ResponseWriter, r *http.Request) {
 	defer resp.Body.Close()
 	byteArray, _ := ioutil.ReadAll(resp.Body)
 
-	jsonBytes := ([]byte)(byteArray)
+	jsonBytes := byteArray
 	var data ConnpassApi
 
 	if err := json.Unmarshal(jsonBytes, &data); err != nil {

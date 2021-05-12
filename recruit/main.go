@@ -60,7 +60,7 @@ func main() {
 	fmt.Println("サーバー起動 :80 port で受信")
 
 	// log.Fatal は、異常を検知すると処理の実行を止めてくれる
-	log.Fatal(http.ListenAndServe(":80", c))
+	log.Fatal(http.ListenAndServe(":60002", c))
 }
 
 // io.Readerをbyteのスライスに変換
@@ -130,6 +130,14 @@ func (r AllGetType) Less(i, j int) bool {
 	return *r[i].Id > *r[j].Id
 }
 
+// errorの構造体
+type errorResponse struct {
+	developerMessage string `json:"developerMessage"`
+	userMessage      string `json:"userMessage"`
+	// code             int    `json:"code"` // 現時点で未実装。独自のエラーごとのコード設計も今後していきたい
+	// info             string `json:"info"` // 現時点で未実装。ドキュメントページも今後実装してURLを返したい
+}
+
 // ==================== AllGet ====================
 type RecruitAllGetResponse struct {
 	Id          *int              `json:"id,omitempty" dynamodbav:"id,omitempty"`
@@ -166,7 +174,30 @@ func (s *Server) RecruitAllGet(w http.ResponseWriter, r *http.Request) {
 			},
 		},
 	}
-	result, _ := s.db.Scan(param)
+	result, err := s.db.Scan(param)
+	if err != nil {
+		fmt.Println("データベースからのデータ取得に失敗しました : error_message =", err)
+		var resErr = errorResponse{
+			userMessage:      "サーバでエラーが発生しました。",
+			developerMessage: "データベースからのデータの取得に失敗しました。",
+		}
+		j, _ := json.Marshal(resErr)
+		w.WriteHeader(http.StatusInternalServerError) // 500
+		w.Write(j)
+		return
+	}
+	if len(result.Items) == 0 {
+		fmt.Println("データが1件もありませんでした : error_message =", err)
+		var resErr = errorResponse{
+			userMessage:      "0件です。",
+			developerMessage: "データが1件もありませんでした。",
+		}
+		j, _ := json.Marshal(resErr)
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotFound) // 404
+		w.Write(j)
+		return
+	}
 
 	var resRecruit = make(AllGetType, 0)
 	dynamodbattribute.UnmarshalListOfMaps(result.Items, &resRecruit)
@@ -219,11 +250,44 @@ func (s *Server) RecruitGet(w http.ResponseWriter, r *http.Request) {
 			},
 		},
 	}
-	result, _ := s.db.Scan(param)
+	result, err := s.db.Scan(param)
+	if err != nil {
+		fmt.Println("データベースからのデータ取得に失敗しました : error_message =", err)
+		var resErr = errorResponse{
+			userMessage:      "サーバでエラーが発生しました。",
+			developerMessage: "データベースからのデータの取得に失敗しました。",
+		}
+		j, _ := json.Marshal(resErr)
+		w.WriteHeader(http.StatusInternalServerError) // 500
+		w.Write(j)
+		return
+	}
+	if len(result.Items) == 0 {
+		fmt.Println("データが1件もありませんでした : error_message =", err)
+		var resErr = errorResponse{
+			userMessage:      "0件です。",
+			developerMessage: "データが1件もありませんでした。",
+		}
+		j, _ := json.Marshal(resErr)
+		w.WriteHeader(http.StatusNotFound) // 404
+		w.Write(j) // TODO: レスポンスがきちんと表示されないので修正する
+		return
+	}
 
 	var resRecruit RecruitGetResponse
 	dynamodbattribute.UnmarshalMap(result.Items[0], &resRecruit)
-	j, _ := json.Marshal(resRecruit)
+	j, err := json.Marshal(resRecruit)
+	if err != nil {
+		fmt.Println("構造体のJSONへの変換に失敗しました : error_message =", err)
+		var resErr = errorResponse{
+			userMessage:      "サーバでエラーが発生しました。",
+			developerMessage: "構造体をJSONに変換するのに失敗しました。",
+		}
+		j, _ := json.Marshal(resErr)
+		w.WriteHeader(http.StatusInternalServerError) // 500
+		w.Write(j)
+		return
+	}
 	w.Write(j)
 
 	// 取得値のログ
@@ -361,7 +425,7 @@ func (s *Server) MemberAdd(w http.ResponseWriter, r *http.Request) {
 	// 募集者にメール送信
 	recruitMail := s.RecruitMailInfo(vars["id"], *reqMember.Position)
 	s.MailSend(recruitMail)
-	
+
 	// 参加者にメール送信
 	joinMail := s.JoinMailInfo(*reqMember.Uid, *reqMember.Position, vars["id"])
 	s.MailSend(joinMail)
