@@ -4,13 +4,13 @@ api_build:
 api_start:
 	docker run --tty -it -d -p 8080:8080 userapi:${version}
 
-compose_build:
+build:
 	docker compose build
 
-compose_start:
+start:
 	docker compose up -d
 
-compose_restart:
+restart:
 	docker compose down; \
     docker compose build; \
     docker compose up -d
