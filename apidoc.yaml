@@ -1,0 +1,54 @@
+openapi: 3.0.0
+info:
+  title: Guild Hack
+  description: 'HEWで作成した「Guild Hack」のAPI仕様書を`OpenAPI3.0`を使用して記述してみた。
+    <br>
+    現在は自身のスキルアップの為にブラッシュアップをかけていく。'
+  contact:
+    email: rintaro0411bus@gmail.com
+  version: 1.0.0
+servers: 
+  - url: http://localhost:60001/
+tags:
+  - name: users
+    description: ユーザー関連API
+paths:
+  /users:
+    get:
+      tags: 
+        - users
+      summary: ユーザーの全件取得
+      description: 配列で帰ってくる
+      parameters: []
+      responses:
+        200:
+          description: JSONの配列のユーザ情報
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserAllGetResponse'
+    # post:
+    #   tags:
+    #   - users
+    #   summary: ユーザの登録
+    #   description: ''
+    #   parameters:
+    #     - name: uid
+    #       description: ユーザーID
+    #       required: true
+    #       schema:
+    #         type: string
+
+components:
+  schemas:
+    UserAllGetResponse:
+      type: object
+      properties:
+        uid:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
