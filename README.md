@@ -3,6 +3,9 @@
 ~~今後全てを移していく。~~
 ~~``apidoc.yaml``の内容を[https://editor.swagger.io](https://editor.swagger.io)にペーストすると確認できる。~~
 
+2021/09/09  
+別途[https://github.com/hew-team1/new-backend](https://github.com/hew-team1/new-backend)に改修中  
+
 # api-dev
 
 ## How to Use
