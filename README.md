@@ -1,7 +1,7 @@
 2021/06/27現在  
-OpenAPIを使用して仕様書を見れるようにyamlに書き換え中。  
-今後全てを移していく。
-``apidoc.yaml``の内容を[https://editor.swagger.io](https://editor.swagger.io)にペーストすると確認できる。
+~~OpenAPIを使用して仕様書を見れるようにyamlに書き換え中。~~
+~~今後全てを移していく。~~
+~~``apidoc.yaml``の内容を[https://editor.swagger.io](https://editor.swagger.io)にペーストすると確認できる。~~
 
 # api-dev
 
